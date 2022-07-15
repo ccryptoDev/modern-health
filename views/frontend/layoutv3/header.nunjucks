@@ -1,0 +1,69 @@
+{% if urlpath == 'borrowerlogin' %}
+	<header id="header">
+		<div class="container-fluid">
+			<div class="practice-name-header" style="display: none;"><h3></h3></div>
+			<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 top-nav pull-right">
+				<a href="/apply"><button class="btn btn-default PfiLogin">New Application</button></a>
+			</div>
+		</div>
+	</header>
+{% else %}
+	{% if req.session.appPracticeName and req.session.appPracticeName != '' and req.session.appPracticeName != null %}
+		<header id="header">
+			<div class="container-fluid">
+				<div class="practice-name-header" style="display: none;"><h3></h3></div>
+				<input type="hidden"
+				<div class="col-xs-12 col-sm-5 col-md-6 col-lg-4 locationNameView"><a href=""><span>{{req.session.appPracticeName}} - {{req.session.appPracticeStateName}},   {{req.session.appPracticeStateCode | upper }} </span></a></div>
+				<div class="col-xs-12 col-sm-7 col-md-6 col-lg-6 top-nav pull-right">
+					{% if urlpath == 'paymentcalculator' or req.session.getStartedPage == 1 or urlpath == 'userinformation' %}
+						<a href="/login"><button class="btn btn-default PfiLogin">Login to {{LenderShortName}}</button></a>
+					{% else %}
+						<a href="/userlogout"><button class="btn btn-default PfiLogin">Logout of {{LenderShortName}}</button></a>
+					{% endif %}
+				</div>
+			</div>
+	    </header>
+	{% else %}
+		<header id="header">
+			<div class="container-fluid">
+				<div class="practice-name-header" style="display: none;"><h3></h3></div>
+				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 top-nav pull-right">
+					{% if urlpath == 'login' %}
+						<a href="/apply"><button class="btn btn-default PfiLogin">Start Application</button></a>
+					{% elif urlpath == 'banktransaction' or urlpath == 'myoffers' or urlpath == 'contract' or urlpath == 'finalize' or urlpath == 'dashboard' %}
+						<a href="/userlogout"><button class="btn btn-default PfiLogin">Logout of {{LenderShortName}}</button></a>
+					{% else %}
+						<a href="/login"><button class="btn btn-default PfiLogin">Login to {{LenderShortName}}</button></a>
+					{% endif %}
+				</div>
+			</div>
+		</header>
+	{% endif %}
+{% endif %}
+<style type="text/css">
+	.container-fluid .practice-name-header h3 {
+		color: #fff;
+		float: left;
+		padding: 20px 15px;
+	}
+</style>
+
+<script type="text/javascript">
+	var currentPath = null;
+	$(document).ready(function() {
+		if($(".has-practice-name-header-shown").length > 0 && (!currentPath || currentPath !== window.location.pathname || !$(".practice-name-header h3").val())) {
+			currentPath = window.location.pathname;
+			ajaxGet("/ajaxGetCurrentLoggedInPractice").then(function(results) {
+				if(results && results.practiceManagement && results.practiceManagement.PracticeName){
+					$(".practice-name-header h3").html(results.practiceManagement.PracticeName);
+					$(".practice-name-header").show();
+				}
+			}, function(errorObj) {
+				console.error(errorObj);
+			})
+		}else {
+			$(".practice-name-header h3").val("");
+			$(".practice-name-header").hide();
+		}
+	});
+</script>

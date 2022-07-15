@@ -1,0 +1,548 @@
+{% extends "frontend/layoutv3/layout.nunjucks" %}
+
+{% block body %}
+<div id="application">
+<style>
+    #userinfoform .stateDiv:before, .birthmonthDiv:before, .birthdayDiv:before, .birthyearDiv:before  {
+        content: '';
+        width: 14px;
+        height: 13px;
+        background: url('../../../images/img/frontend/chevron-down.png') no-repeat;
+        background-size: 100%;
+        position: absolute;
+        right: 20px;
+        top: 21px;
+        z-index: 0;
+		pointer-events: none;
+    }
+    .selectBox:focus {
+        border-color: 1px solid #63944C !important;
+    }
+</style>
+<input type="hidden" id="reapplyerror" value="{{ reapplyerror }}">
+<input type="hidden" id="dupusererror" value="{{ dupusererror }}">
+<div class="container has-practice-name-header-shown">
+	<div class="inner-content">
+		<div class="heading">
+	        <div class="logoMiddle">
+	        	<img src="images/imgv3/logo.png" class="img-reponsive" />
+	        </div>
+	    </div>
+        <div class="row" id="loaderIdCreateTracking" style="display:none;">
+            <div class="" align="center" style="text-align:center;position:fixed;top:0;left:0;right:0;bottom:0;z-index:100;background:rgba(0,0,0,0.7);">
+                <div style="height:100%;width:100%;background:url('/images/img/ajaxloader.gif') no-repeat center;margin-top:-233px;"></div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 personalInfoInner">
+            <div class="whitebox infoForm">
+                <div class="v-center">
+                    <div class="h-center">
+						<form class="formclass signupForm" id="userinfoform" action="/createapplication" method="POST" data-validation="btnDisable" name="userinfo" autocomplete="off">
+							<input type="hidden" id="practicemanagement" name="practicemanagement" value="{{ practice.id }}" />
+                            <br />
+                            <h3>Tell us more about yourself.</h3>
+                            <br /><br />
+                                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control form-application" id="street" name="street" placeholder="Street Address" autocomplete="off" tabindex="1" required value="{{ userinfo.street }}" />
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control form-application" id="city" name="city" placeholder="City" autocomplete="off" tabindex="3" required value="{{ userinfo.city }}"/>
+                                    </div>
+                                    <div class="form-group">
+                                        <span class="fa fa-fw field-icon toggle-password fa-eye eyespan" toggle="#social" onclick="maskSSN(this)"></span>
+                                        <input type="hidden" id="ssn-val" name="ssn_number" value=""/>
+                                        <input type="text" class="form-control form-application" id="social" name="ssn" placeholder="Social Security Number" maxlength="11" autocomplete="new-password" tabindex="6" value="" required />
+                                    </div>
+                                    <div class="form-group stateDiv">
+                                        <select name="residenceType" id="residenceType" class="form-control form-application selectBox" tabindex="10" required>
+                                            <option value="" selected disabled hidden>Type of Residence</option>
+                                            <option value="own" {% if screenTracking.residenceType and screenTracking.residenceType == 'own' %}selected{% endif %}>Own</option>
+                                            <option value="rent" {% if screenTracking.residenceType and screenTracking.residenceType == 'rent' %}selected{% endif %}>Rent</option>
+                                            <option value="other" {% if screenTracking.residenceType and screenTracking.residenceType == 'other' %}selected{% endif %}>Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control form-application" id="unit" placeholder="Unit/Apartment" name="unitapt" autocomplete="off" tabindex="2" value="{{ userinfo.unitapt }}" />
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="container-fluid">
+                                            <div class="row">
+                                                <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 stateDiv">
+                                                    <select name="state" id="state" class="form-control form-application selectBox" tabindex="4" required>
+                                                        <option value="" {% if not userinfo or not userinfo.state %}selected{% endif %} disabled hidden>State</option>
+                                                        {% for stateDetails in stateData %}
+                                                            <option value="{{stateDetails.stateCode}}" {% if userinfo and userinfo.state == stateDetails.stateCode %}selected{% endif %}>{{stateDetails.stateName}}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 nopadding-r zipDiv">
+                                                    <input type="text" class="form-control form-application" id="zip" name="zip" placeholder="Zip" autocomplete="off" tabindex="5" value="{{ userinfo.zipCode }}" required />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="container-fluid">
+                                            <div class="row">
+												<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 birthmonthDiv">
+													<select id="birthmonth" name="birthmonth" class="form-control form-application selectBox" required tabindex="7">
+														<option value="" selected disabled hidden>Birth Month</option>
+														<option value="01">January</option>
+														<option value="02">February</option>
+														<option value="03">March</option>
+														<option value="04">April</option>
+														<option value="05">May</option>
+														<option value="06">June</option>
+														<option value="07">July</option>
+														<option value="08">August</option>
+														<option value="09">September</option>
+														<option value="10">October</option>
+														<option value="11">November</option>
+														<option value="12">December</option>
+													</select>
+												</div>
+												<div class="col-xs-0 col-sm-0 col-md-1 col-lg-1 leftspaceDiv"></div>
+												<div class="col-xs-4 col-sm-4 col-md-3 col-lg-3 birthdayDiv">
+													<select id="birthday" name="birthday" class="form-control form-application selectBox" required tabindex="8">
+														<option value="" selected disabled hidden>Day</option>
+														<option value="01">1</option>
+														<option value="02">2</option>
+														<option value="03">3</option>
+														<option value="04">4</option>
+														<option value="05">5</option>
+														<option value="06">6</option>
+														<option value="07">7</option>
+														<option value="08">8</option>
+														<option value="09">9</option>
+														<option value="10">10</option>
+														<option value="11">11</option>
+														<option value="12">12</option>
+														<option value="13">13</option>
+														<option value="14">14</option>
+														<option value="15">15</option>
+														<option value="16">16</option>
+														<option value="17">17</option>
+														<option value="18">18</option>
+														<option value="19">19</option>
+														<option value="20">20</option>
+														<option value="21">21</option>
+														<option value="22">22</option>
+														<option value="23">23</option>
+														<option value="24">24</option>
+														<option value="25">25</option>
+														<option value="26">26</option>
+														<option value="27">27</option>
+														<option value="28">28</option>
+														<option value="29">29</option>
+														<option value="30">30</option>
+														<option value="31">31</option>
+													</select>
+												</div>
+												<div class="col-xs-2 col-sm-2 col-md-1 col-lg-1 rightspaceDiv"></div>
+												<div class="col-xs-6 col-sm-6 col-md-3 col-lg-3 birthyearDiv">
+													<select id="birthyear" name="birthyear" class="form-control form-application selectBox" required tabindex="9">
+														<option value="" selected disabled hidden>Year</option>
+														{% for year in birthYears %}
+														<option value="{{year}}">{{year}}</option>
+														{% endfor %}
+													</select>
+												</div>
+											</div>
+										</div>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control form-application" id="housingExpense" name="housingExpense"  placeholder="Housing Expense" value="{{ screenTracking.housingExpense }}" tabindex="11" autocomplete="off" onkeyup="this.value=this.value.replace(/[^\d]/,'')" required/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control form-application" id="incomeamount" placeholder="Monthly Income" name="incomeamount" autocomplete="off" value="{{ screenTracking.incomeamount if screenTracking.incomeamount else userinfo.incomeamount}}" onkeyup="this.value=this.value.replace(/[^\d]/,'')" tabindex="12" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <div class="facheckbox" style="z-index: 0; text-align: left; font-size: 15px;">
+                                        <input type="checkbox" name="creditpullconfirm" id="creditpullconfirm" tabindex="13" required/>
+                                        <label for="creditpullconfirm" id="tcpacreditpull"></label>
+                                        <span>I consent to the </span>
+                                        <a href="javascript:void(0)" style="color: #63944C;" onclick="opentcpa();"><strong>SMS Policy,</strong></a>
+                                        <a href="javascript:void(0)" style="color: #63944C;" onclick="opencredit();"><strong>Credit Pull Consent</strong></a>
+                                        <span>and,</span>
+                                        <a href="javascript:void(0)" style="color: #63944C;" onclick="openesign();"><strong>E-Signature</strong></a>
+                                        <span>agreements</span>
+                                        <div>
+                                            <label id="creditpullconfirm-error" class="error" for="creditpullconfirm"></label>
+                                        </div>
+                                    </div>
+                                </div>
+								<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <div>
+                                        <div class="server-error error" style="display: {{ 'block' if applicationerror and not applicationerror == ''  else 'none' }};" >{{ applicationerror }}</div>
+                                        <button type="submit" class="btn-application" style="margin-top: 12px; margin-bottom: 18px;" tabindex="14">Next</button>
+                                    </div>
+                                </div>
+                            <input type="hidden" id="consent" name="consent" value="true">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- tcpadocument Modal -->
+<div id="tcpadocument" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header bg-tcpa user-modal-header" style="background-color:#63944C;">
+                <h4 class="modal-title" id="storyinfopopupheader"></h4>
+                <button type="button" class="close" data-dismiss="modal" style="color:#FFF; opacity:1;">&times;</button>
+            </div>
+            <div class="modal-body bgColorWhite">
+                {% if smsPath %}
+                    {% include smsPath %}
+                {% endif %}
+            </div>
+            <div class="text-center">
+                <button type="button" data-dismiss="modal" class="btn-application">Continue</button>
+            </div>
+            <br /><br />
+        </div>
+    </div>
+</div>
+<!-- creditpulldocument Modal -->
+<div id="creditpulldocument" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header bg-tcpa user-modal-header" style="background-color:#63944C;">
+                <h4 class="modal-title" "color:#FFFF;"></h4>
+                <button type="button" class="close" data-dismiss="modal" style="color:#FFF; opacity:1;">&times;</button>
+            </div>
+            <div class="modal-body bgColorWhite">
+                {% if creditAuthPath %}
+                    {% include creditAuthPath %}
+                {% endif %}
+            </div>
+            <div class="text-center">
+                <button type="button" data-dismiss="modal" class="btn-application">Continue</button>
+            </div>
+            <br /><br />
+        </div>
+    </div>
+</div>
+<!-- esigndocument Modal -->
+<div id="esigndocument" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header bg-tcpa user-modal-header" style="background-color:#63944C;">
+                <h4 class="modal-title" "color:#FFFF;"></h4>
+                <button type="button" class="close" data-dismiss="modal" style="color:#FFF; opacity:1;">&times;</button>
+            </div>
+            <div class="modal-body bgColorWhite">
+                {% if esignPath %}
+                    {% include esignPath %}
+                {% endif %}
+            </div>
+            <div class="text-center">
+                <button type="button" data-dismiss="modal" class="btn-application">Continue</button>
+            </div>
+            <br /><br />
+        </div>
+    </div>
+</div>
+<!-- 30 day denial rule -->
+<div id="thirtyDayDenialRule" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content user-modal-content">
+            <div class="modal-header bg-tcpa user-modal-header" style="background-color:#63944C;">
+                <a type="button" class="close" href="/">&times;</a>
+            </div>
+            <br /> <br />
+            <div class="alert alert-danger text-center">
+                {{ reapplyerror }}
+            </div>
+            <br />
+            <div class="text-center">
+                <button type="button" onclick="window.location.href='/'" class="btn-application">Exit</button>
+            </div>
+            <br />
+        </div>
+    </div>
+</div>
+<!-- Existing User -->
+<div id="existingUser" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content user-modal-content">
+            <div class="modal-header user-modal-header">
+                <a type="button" class="close" onclick="logoutRedirectSignin();">&times;</a>
+            </div>
+            <br /> <br />
+            <div class="alert alert-danger text-center">
+                {{ dupusererror }}
+            </div>
+            <br />
+            <div class="text-center">
+                <button type="button" onclick="logoutRedirectSignin();" class="btn-application">Sign In</button>
+            </div>
+            <br />
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var ssn_value;
+    var $ssn;
+    var $ssnVal;
+    document.addEventListener( "DOMContentLoaded", function() {
+        if( $( "#reapplyerror" ).val() != "" ) {
+            console.log( "input error", $( "#reapplyerror" ).val() );
+            $('#thirtyDayDenialRule').modal( {backdrop: 'static', keyboard: false} );
+        }
+        if( $( "#dupusererror" ).val() != "" ) {
+            console.log( "input dup ssn error", $( "#dupusererror" ).val() );
+            $('#existingUser').modal( {backdrop: 'static', keyboard: false} );
+        }
+
+		$.validator.addMethod("haveFullBirthday", function(value, element) {
+			if(!value) {
+				return false;
+			}
+
+			var birthmonth = $("#birthmonth").val();
+			if( ! birthmonth ) {
+				return false;
+			}
+
+			var birthday = $("#birthday").val();
+			if( ! birthday ) {
+				return false;
+			}
+
+			return true;
+		});
+
+
+		$.validator.addMethod("candidateIsEighteen", function(value, element) {
+			var birthday = moment( value + "-" + $("#birthmonth").val() + "-" + $("#birthday").val(), "YYYY-MM-DD" );
+			var age = moment().diff( birthday, "years" );
+			if( age < 18 ) {
+				return false;
+			}
+			return true;
+		});
+
+        var validator = $("#userinfoform").validate( {
+            rules: {
+                "street": { required: true },
+                "city": { required: true },
+                "state": { required: true },
+                "zip": { required: true, minlength: 5, maxlength: 5, digits: true },
+                "ssn": { required: true, minlength: 11, maxlength: 11 },
+				"birthmonth": { required: true, digits: true },
+				"birthday": { required: true, digits: true },
+				"birthyear": { required: true, digits: true, haveFullBirthday: true, candidateIsEighteen: true },
+                "housingExpense": { required: true },
+                "residenceType": { required: true }
+                /* "creditpullconfirm": { required: true } */
+            },
+            messages: {
+                "street": { required: "Street address is required." },
+                "city": { required: "City is required." },
+                "state": { required: "State is required." },
+                "zip": { required: "Zip code is required.", minlength: "Invalid zip code.", maxlength: "Invalid zip code." },
+                "ssn": { required: "Social security number is required.", minlength: "Invalid social security number.", maxlength: "Invalid social security number." },
+				"birthmonth": { required: "Birth month is required." },
+				"birthday": { required: "Birth day is required." },
+				"birthyear": { required: "Birth year is required.", haveFullBirthday: "A full birthday is required.", candidateIsEighteen: "You must be 18 years of age to apply." },
+                "housingExpense": { required: "Housing expense is required." },
+                "residenceType": { required: "Type of residence is required." }
+                /* "creditpullconfirm": { required:  "You must consent to the agreements." } */
+            },
+            errorPlacement: function( err, el ) {
+                var errId = err.attr( "id" );
+                var errEl = $( "#" + errId );
+                if( errEl.length === 1 ) {
+                    errEl.html( err.html() );
+                } else {
+                    err.appendTo( el.parent() );
+                }
+            },
+            unhighlight: function( el ) {
+                var $el = $( "#" + $(el).attr( "id" ) + "-error" );
+                if( $el.length === 1 ) {
+                    $el.html( "" );
+                }
+            },
+			submitHandler: ( form ) => {
+/*
+				( $( "#tcpacreditpull:checkbox:checked" ).length > 0 ) ? console.log("tcp checked"): console.log("tcp not checked");
+				( $( "#creditpullconfirm:checkbox:checked" ).length > 0 ) ? console.log("pull checked"): console.log("pull not checked");
+*/
+				/* prevent the form and checkbox from being changed by the user after the submit button has been clicked and before the screen is replaced */
+                $("#loaderIdCreateTracking").show();
+				 form.submit();
+            }
+        } );
+
+        $( "#incomeamount" ).on( "change blur keyup keypress", function( e ) {
+            var $el = $( "#incomeamount" );
+            var val = parseFloat( $el.val().replace( /[^0-9]/g, "" ) ) || "";
+            console.log( "incomeamount:", $el.val(), val );
+            if( val != "" ){
+                $el.val( "$" + val.toLocaleString( "en-US", { maximumFractionDigits: 0, minimumFractionDigits: 0 } ) );
+            }
+        } );
+
+        $( "#housingExpense" ).on( "change blur keyup keypress", function( e ) {
+            var $el = $( "#housingExpense" );
+            var val = parseFloat( $el.val().replace( /[^0-9]/g, "" ) ) || "";
+            console.log( "housingExpense:", $el.val(), val );
+            if( val != "" ){
+                $el.val( "$" + val.toLocaleString( "en-US", { maximumFractionDigits: 0, minimumFractionDigits: 0 } ) );
+            }
+        } );
+
+        $ssn = $( "#social" );
+        $ssn.isMasked = true;
+        $ssnVal = $( "#ssn-val" );
+        ssnMask.init();
+
+		function updateDaySelect( dayInt, monthdays ) {
+			var html = [];
+			if( !dayInt || ( dayInt > monthdays ) ) {
+				html.push( "<option value='' selected disabled hidden>Day</option>" );
+			}
+			for( var idx = 1; idx <= monthdays; idx++ ) {
+				let value;
+				if( idx < 10 ) {
+					value = "0" + idx;
+				} else {
+					value = "" + idx;
+				}
+				if( dayInt && dayInt == idx ) {
+					html.push("<option value='", value, "' selected>", idx, "</option>" );
+				} else {
+					html.push("<option value='", value, "'>", idx, "</option>" );
+				}
+			}
+			$("#birthday").html( html.join( "" ) );
+
+		}
+
+		$("#birthmonth").change( ( monthidx ) => {
+			var day = $("#birthday").val();
+			var dayInt;
+			if( day ) {
+				dayInt = parseInt( day );
+			}
+			var year = $("#birthyear").val();
+			var monthdays;
+			if( year ) {
+				monthdays = moment( year + "-" + $("#birthmonth").val() , "YYYY-MM" ).daysInMonth();
+			} else {
+				monthdays = moment( "1992" + "-" + $("#birthmonth").val(), "YYYY-MM" ).daysInMonth();
+			}
+			updateDaySelect( dayInt, monthdays );
+		});
+
+		$("#birthyear").change( ( monthidx ) => {
+			var month = $("#birthmonth").val();
+			if( !month ) {
+				return;
+			}
+
+			var day = $("#birthday").val();
+			var dayInt;
+			if( day ) {
+				dayInt = parseInt( day );
+			}
+
+			var year = $("#birthyear").val();
+			const monthdays = moment( year + "-" + month, "YYYY-MM" ).daysInMonth();
+			updateDaySelect( dayInt, monthdays )
+		});
+    } );
+
+    function maskSSN( el ) {
+        $( el ).toggleClass( "fa-eye fa-eye-slash" );
+        $ssn.isMasked = ! $ssn.isMasked;
+        $ssn.val( ssnMask.transformDisplay( $ssnVal.val() ) );
+    }
+
+    var ssnMask = {
+        init: function () {
+            this.bind();
+        },
+        bind: function () {
+            $ssn.on( "keyup paste drop", this.syncInput );
+        },
+        transformDisplay: function (val) {
+            // Strip all non numbers
+            var displayVal = val.replace(/[^0-9|\\*]/g, '');
+            displayVal = displayVal.substr(0, 9);
+            // Inject dashes
+            if (displayVal.length >= 4) {
+                displayVal = displayVal.slice(0, 3) + '-' + displayVal.slice(3);
+            }
+            if (displayVal.length >= 7) {
+                displayVal = displayVal.slice(0, 6) + '-' + displayVal.slice(6);
+            }
+            // Replace all numbers with astericks
+            if( $ssn.isMasked ) {
+                displayVal = displayVal.replace(/[0-9]/g, '*');
+            }
+            return displayVal;
+        },
+        transformValue: function( val ) {
+            if (typeof ssn_value !== 'string') {
+                ssn_value = "";
+            }
+            if( ! val ) {
+                ssn_value = "";
+                return;
+            }
+            var cleanVal = val.replace(/[^0-9|\\*]/g, '');
+            cleanVal = cleanVal.substr(0, 9);
+            for (i = 0, l = cleanVal.length; i < l; i++) {
+                if (/[0-9]/g.exec(cleanVal[i])) {
+                    if( ssn_value.length === 0 || ssn_value.length === i){
+                        ssn_value += cleanVal[i];
+                    }else {
+                        ssn_value = ssn_value.substr(0,i) + cleanVal.charAt(i) + ssn_value.substr(i+1)
+                    }
+                 }
+            }
+            ssn_value = ssn_value.substr(0, cleanVal.length);
+        },
+        syncInput: function(e) {
+                var $input = $(this);
+                var val = $(this).val();
+                var displayVal = ssnMask.transformDisplay(val);
+                ssnMask.transformValue(val);
+                this.setSelectionRange(val.length, val.length);
+                $input.val(displayVal);
+                $ssnVal.val(ssn_value);
+        }
+    };
+
+    function logoutRedirectSignin() {
+        $.ajax( { url: "/userlogout" } ).done( function() { window.location.href = "/login"; } );
+    }
+    function opentcpa(){
+        $('#tcpadocument').modal('show');
+    }
+    function opencredit(){
+        $('#creditpulldocument').modal('show');
+    }
+    function openesign(){
+        $('#esigndocument').modal('show');
+    }
+</script>
+</div>
+{% endblock %}

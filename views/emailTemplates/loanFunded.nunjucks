@@ -1,0 +1,12 @@
+{% extends "emailTemplates/emaillayout.nunjucks" %}
+{% block body %}
+	<div class="emailBodyOuterDiv">
+        <h2 class="emailGreetings">Hi {{ name | capitalize }},</h2>
+        <div class="emailBodyMessage">
+            Congratulations your agreement has been approved.<br><br>
+			Financing Reference Number:  {{ loanReference }}<br><br>
+            <a href="{{ Link }}"><button class="btn-application">Customer Login</button></a><br><br>
+			Notice: The federal Equal Credit Opportunity Act prohibits creditors from discriminating against credit applicants on the basis of race, color, religion, national origin, sex, marital status, age (provided the applicant has the capacity to enter into a binding contract); because all or part of the applicant's income derives from any public assistance program; or because the applicant has in good faith exercised any right under the Consumer Credit Protection Act. The federal agency that administers compliance with this law concerning this creditor is the Federal Trade Commission (FTC), Equal Credit Opportunity, Washington, D.C. 20580.
+        </div>
+    </div>
+{% endblock %}

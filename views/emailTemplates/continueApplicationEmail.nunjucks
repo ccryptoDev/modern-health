@@ -1,0 +1,11 @@
+{% extends "emailTemplates/emaillayout.nunjucks" %}
+{% block body %}
+	<div class="emailBodyOuterDiv">
+        <h2 class="emailGreetings">Hi {{ name | capitalize }},</h2>
+
+        <div class="emailBodyMessage">
+            Please click button to continue your application with {{LenderShortName}}.<br><br>
+            <a href="{{ Link }}"><button class="btn-application">Login</button></a>
+        </div>
+    </div>
+{% endblock %}

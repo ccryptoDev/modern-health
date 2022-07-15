@@ -1,0 +1,42 @@
+{
+	"env": {
+		"browser": true,
+		"commonjs": true,
+		"es6": true,
+		"node": true
+	},
+	"extends": [ "eslint:recommended", "google" ],
+	"globals": {
+		"Atomics": "readonly",
+		"SharedArrayBuffer": "readonly"
+	},
+	"parserOptions": {
+		"ecmaVersion": 2018
+	},
+	"rules": {
+		"array-bracket-spacing": [ "warn", "always" ],
+		"arrow-spacing": [ "error", { "before": true, "after": true } ],
+		"block-spacing": [ "error", "always" ],
+		"brace-style": [ "error", "1tbs", { "allowSingleLine": true } ],
+		"camelcase": 0,
+		"comma-dangle": [ "error", "never" ],
+		"comma-spacing": [ "error", { "before": false, "after": true } ],
+		"computed-property-spacing": [ "warn", "always" ],
+		"curly": [ "warn", "all" ],
+		"indent": [ "warn", "tab", { "SwitchCase": 1, "MemberExpression": 0, "CallExpression": { "arguments": 1 } } ],
+		"keyword-spacing": [ "warn", { "before": true, "after": true, "overrides": { "if": { "after": false }, "for": { "after": false }, "switch": { "after": false }, "while": { "after": false } } } ],
+		"linebreak-style": [ "error", "unix" ],
+		"max-len": "off",
+		"no-console": 0,
+		"no-tabs": 0,
+		"no-unused-vars": "error",
+		"no-var": "warn",
+		"object-curly-spacing": [ "error", "always" ],
+		"prefer-promise-reject-errors": "error",
+		"quotes": [ "warn", "double", { "avoidEscape": true } ],
+		"require-jsdoc": 0,
+		"semi": [ "error", "always" ],
+		"space-before-function-paren": [ "warn", "never" ],
+		"space-in-parens": [ "warn", "always" ]
+	}
+}
